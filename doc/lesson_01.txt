@@ -1,0 +1,79 @@
+CLASS NOTES, Lesson 1
+=====================
+
+Basic Data Types
+----------------
+
+1. Atoms
+
+The most vexing data type in Erlang is the "atom".  You'll use them a lot, and
+learn to love them, but they can be confusing at first.  The easiest way to
+think of them as being literals for abstract concepts.  A certain atom is
+only equal to itself, and other than comparison they have no use.  They are
+literally there to be abstract identities.  Analogues in other languages
+include C's enumerations, and the use of singleton classes as "sentinel
+values".
+
+Atom literals are constructed as either a lower-case word (possibly including,
+but not starting with, underscores and numbers).  They can also be written
+using any characters as a string delimited by the single quote.
+
+Examples:
+
+* hello
+* ok
+* error
+* 'Hello'
+* '$ATOM'
+* catch22
+* '_'
+
+2. Integers
+
+These work like other languages.  There is nothing surprising about them.
+
+Okay, I lied.  There is ONE surprising thing about them.  The literal syntax.
+It is possible to specify the base of a number, and there is also a special
+syntax for ASCII character values that makes it easy to construct strings
+by using the constituent values of the characters.
+
+Examples:
+
+* 1
+* 42
+* 2#00110100 % this is binary
+* 16#CAFEBABE % this is hexadecimal, i.e. base-16
+* 8#0777 % this is octal
+* $A % this is the ASCII value of the character "A"
+* $\n % this is the ASCII value of the newline character
+
+3. Floating Point Numbers
+
+Same here.
+
+4. Strings
+
+This causes some consternation and can be a performance nightmare.  Strings,
+in Erlang, are just lists of character values.  This is interesting in that
+Unicode actually is just one integer (of arbitrary size), per character.
+The downside is that this makes things a bit inefficient.
+
+Examples:
+
+* "abc"
+* [$a,$b,$c] % same as above, written as a list
+
+NOTE: Pretty printing lists occasionally prints out strings, this is a 
+downside of this approach.
+
+5. Lists
+
+TODO
+
+6. Tuples
+
+TODO
+
+7. Records
+
+TODO

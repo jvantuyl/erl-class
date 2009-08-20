@@ -1,0 +1,169 @@
+CLASS NOTES, Lesson 0
+=====================
+
+Getting Started
+---------------
+
+As you likely know, the class notes and sample projects are available on 
+GitHub via git at: git://github.com/jvantuyl/erl-class.git
+
+For your own projects, I've made available my empty skeleton of an Erlang 
+project.  It's available via git at: git://github.com/jvantuyl/erl-skel.git
+I encourage people to use this as a base, but please do not fork the project.
+Rather, clone it, delete the .git directory, and then reinitialize it:
+
+* git clone git://github.com/jvantuyl/erl-skel.git myproject/
+* cd myproject
+* rm -rf .git
+* git init
+* git commit -m 'Bare Directory Structure'
+
+At this point it should be ready to push to your "git host" of choice.
+
+Directory Structure
+-------------------
+
+This is the basic layout of an Erlang project.  Conforming to this directory
+structure is very helpful for deploying using the existing Erlang tools.
+
+Here's a quick overview of the directories:
+
+* config:  example configuration data goes here
+* cover:   if you use the etap framework for testing, it puts code coverage 
+           stuff here
+* doc:     documentation
+* ebin:    compiled Erlang .beam files go here
+* include: Erlang .hrl header files go here
+* priv:    Private data, including binary extensions, go here
+* scripts: Various scripts, usually written using escript or shell, go here
+* src:     Source Erlang .erl files (and .c files if you need them), go here
+* tests:   If you use the etap framework for testing, executable .t tests go
+           here
+
+Build System
+------------
+
+I've taken the liberty of rolling a very simple Makefile that compiles any
+.erl files you put in src, using include files in include, dropping the
+results in ebin.  I utilize Erlang's built in make module for module for most
+of this magic, so do pay attention to the Emakefile if you want a 
+comprehensive understanding of what's going on.
+
+The Makefile has the following targets:
+
+* compile: compiles source files, using make:all()
+* clean:   deletes all generated files
+* test:    runs tests in tests/*.t (requires etap)
+* cover:   runs tests in tests/*.t, generates coverage report (requires etap)
+* report:  opens coverage report on MacOSX
+* live:    runs an Erlang node in the build environment as console@localhost
+
+Overall Structure of a Module
+-----------------------------
+
+Take a look at "src/lesson_00_0.erl".  This is the source for what is called
+a "module".  You'll notice a few conventions.
+
+First, certain lines start with a hyphen.  These are called "attributes".
+They are generally instructions to the compiler or the interpreter.  Each 
+module starts with an attribute that defines its name.
+
+Second, you'll note that there is an export statement.  When you compile a
+module, every defined function should either be used or exported for use by
+some other system.  In this case, we export the function count/1.  This 
+notation indicates that count takes one parameter.  Note that even though
+two functions might have the same name, they are different functions if they
+have two different arities (i.e. number of arguments == arity of a function).
+This trick is occasionally used to make convenient versions of a function, or
+to allow the short invocation to be the API, while the longer one defines what
+is traditionally considered to be a "helper function", that actually carries
+out the operation.
+
+Third, comments begin with the percent sign.  There are only end-of-line-style
+comments, not block-style comments.
+
+Actual Code
+-----------
+
+Next you'll note the code.  All functions in Erlang (and generally all code
+is functions) are expressed as a series of "heads".  A head has a name
+and a pattern.  While I won't dive into patterns right now, it's essentially
+the "shape" of the function.  In addition to the pattern, it may also have 
+guards.  Guards further restrict the "shape" of a function.  This makes it
+easy to have a wide variety of behavior depending on what data is passed to
+the function.
+
+I have defined a function "count", which generates a list of numbers counting
+up to some number N, which is specified (and must be an integer).  I also
+define a recursive function that actually generates the list, named do_count.
+
+A Note About Syntax
+-------------------
+
+First, you'll note that each line ends with a period.  This bit of syntax is
+inherited from Prolog, and conceptually comes from the model that each "form"
+is expressing some abstract idea.  You end it with a period for the same 
+reason that you end a sentence with one--because it's saying something.
+
+This is notable because subexpressions may never be executed, but a function
+definition "realizes" something.
+
+Next, you'll note some commas and semicolons.  As a general rule of thumb, use
+a semicolon when something is a parallel statement, and a comma when it's a
+series statement.
+
+Note the comma in the list of guards on do_count.  These guards must all match
+and can be thought of as a series.
+
+Note the semicolon between the two heads of do_count.  Every time this 
+function is called, either head could be executed.  This can be thought of as
+parallel paths of execution.  This simple rule of thumb will get you through
+all of the time.  In this respect, Erlang is very consistent.
+
+Some Other Syntax
+-----------------
+
+Note how the arrow (->) is used to define functions.  You will also see it in
+various other pattern-matching operations (anonymous functions, case 
+statements, try statements, receive statements).  Basically, when you see it,
+something gets matched against the first part, and then evaluates to the
+second part.
+
+Also, note the "list builder" syntax.  This harkens back to LISP and most 
+other functional languages.  They build lists as "cons-cells".  For your
+purposes, that means you can think of a list as pairs.  Each pair is made up
+of a "head" and a "tail".  The tail is another list, or "the empty list",
+which indicates the end of the list.  The "head" can be any term.  Using the
+| syntax, you can construct a list, usually through recursion, as I have done
+here.
+
+Note that Erlang is picky about operators that look like arrows.  That's why
+you see =<, not <= for less-than-or-equal-to.  This is a stylistic choice that
+directly conflicts with C-like languages, where they purposely put the = at
+the end, and use operators like =< to be assignment operations.  Erlang
+doesn't do this, so don't get confused.  This is also the reason that 
+bit-shift operators are not the familiar << and >> (but rather bsl and bsr).
+
+Running Our Code
+----------------
+
+If you run "make live", it will start an initial interpreter for you.  This
+will compile our code and make sure it's accessible.
+
+To generate a list that counts to five using our example code, enter:
+
+lesson_00_0:count(5).
+
+This should display:
+
+[1,2,3,4,5]
+
+Controlling the Interpreter
+---------------------------
+
+TODO
+
+Examining The Environment
+-------------------------
+
+TODO
