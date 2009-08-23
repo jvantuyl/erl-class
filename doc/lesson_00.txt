@@ -282,8 +282,8 @@ surprised that they have interfaces too.
 Conclusion
 ----------
 
-This concludes the zeroth lesson.  Hopefully you now have an installed Erlang
-installation; cloned the erl-class repository; know how to use or Makefile to
+This concludes the zeroth lesson.  Hopefully you now have a functional Erlang
+installation; cloned the erl-class repository; know how to use our Makefile to
 build code; know how to control the interactive shell; and know just enough
 Erlang to be modicum of trouble.
 
