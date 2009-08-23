@@ -16,7 +16,9 @@ values".
 
 Atom literals are constructed as either a lower-case word (possibly including,
 but not starting with, underscores and numbers).  They can also be written
-using any characters as a string delimited by the single quote.
+using any characters as a string delimited by the single quote.  While this
+data type may not immediately seem extremely useful, combined with tuples and
+pattern-matching, it provides a very functional code-by-example pattern.
 
 Examples:
 
@@ -51,7 +53,11 @@ Examples:
 
 Same here.
 
-4. Strings
+4. Lists
+
+TODO
+
+5. Strings
 
 This causes some consternation and can be a performance nightmare.  Strings,
 in Erlang, are just lists of character values.  This is interesting in that
@@ -65,10 +71,6 @@ Examples:
 
 NOTE: Pretty printing lists occasionally prints out strings, this is a 
 downside of this approach.
-
-5. Lists
-
-TODO
 
 6. Tuples
 

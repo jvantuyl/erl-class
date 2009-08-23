@@ -20,6 +20,26 @@ Rather, clone it, delete the .git directory, and then reinitialize it:
 
 At this point it should be ready to push to your "git host" of choice.
 
+This tutorial assumes that you already have a working Erlang installation.
+In Debian GNU/Linux and friends, one can be installed with:
+
+apt-get install erlang
+
+This will install some X-Windows components.  There is an alternative package
+available as erlang-nox, if you want to maintain a purely command-line system.
+For truly exploring the Erlang system, some of the visualization tools are
+quite useful, so I recommend this only for advanced installations or
+irrational purists.  You know who you are.
+
+For MacOSX, I suggest MacPorts, available from http://macports.org.  I also
+recommend building the software with the Mac-native Quartz graphics.  Once
+you have a working ports installation, you'll want to try something like:
+
+sudo port install tk +quartz
+sudo port install erlang
+
+This should get you a happier, prettier Erlang.
+
 Directory Structure
 -------------------
 
@@ -147,8 +167,13 @@ bit-shift operators are not the familiar << and >> (but rather bsl and bsr).
 Running Our Code
 ----------------
 
-If you run "make live", it will start an initial interpreter for you.  This
-will compile our code and make sure it's accessible.
+If you run "make live", it will start the Erlang runtime in "interactive"
+mode.  This will start up the basic system (i.e. the 'kernel' application)
+and create an interactive shell process that will immediately be presented
+to you.  Note that it will compile our code and make sure it's accessible,
+so it's a handy way to dive into the class examples.  In a production system,
+you'll have to learn how to do what it does for you, but more about that in
+later lessons.
 
 To generate a list that counts to five using our example code, enter:
 
@@ -158,12 +183,108 @@ This should display:
 
 [1,2,3,4,5]
 
-Controlling the Interpreter
----------------------------
+Note that this executed the function 'count' in the module 'lesson_00_0'.  To
+shut down the Erlang node, you can use a similar notation to call a function
+that tells Erlang's initialization system to stop the system.  To do so, use
+the command:
 
-TODO
+init:stop().
+
+The Erlang Environment
+----------------------
+
+The interactive shell that you see is really sitting atop an entire runtime
+system.  Any number of Erlang "processes" are running within the Erlang
+"Virtual Machine".  While the Erlang VM uses system-level threads, it each
+Erlang process is scheduled by the VM in a single system process.  This 
+enables them to be extremely light-weight.
+
+This interactive shell is just a process running in an instance of the Erlang
+VM.  Each of these instances is called a "node", and may have a name.  The
+Makefile starts a node named 'console@yourhost', by default.  Note that I
+write the node name as a string delimited by single quotes.  This is the first
+example you'll see of a special data-type called an "atom".  Atoms are very
+important in Erlang.  They are not like normal strings, so it's best to take
+careful note of the single-quotes (or any time that something is identifiably
+an atom).
+
+Controlling the Shell
+---------------------
+
+The shell that you see is just one of potentially many interactive "jobs".
+There is an interface to manage these jobs, and it can be very handy.  It's
+called "User switch command".  Bad name, I know.  The key to "break out" into
+this mode is Ctrl-G.  You will get a prompt that looks like " -->".
+
+If you type a question-mark followed by enter, you will get a list of commands
+that are available.  The most useful one here is "q", which quits the whole
+of the Erlang VM.  If you somehow get your shell "wedged", this is how you
+can easily escape.  You can also start another shell here, which can be
+helpful for fixing a system without killing it.
+
+What's most interesting here, is that you can start a remote shell.  While
+we haven't mentioned much about distributed Erlang, just know that this is
+where you can start a shell in any other Erlang node that trusts you.  This
+will also be the way that you connect to your Erlang "daemons" to control or
+poke them as necessary.
+
+You may also want to play around with the more standard BREAK sequence of
+Ctrl-C.  It gives you a slightly different set of options.  When in doubt,
+use Ctrl-G, as Ctrl-C can do a bit more damage and is much more likely to
+halt any background processes that you may not want to interrupt.
 
 Examining The Environment
 -------------------------
 
-TODO
+Erlang is handy in that it comes with many tools to inspect the running
+environment.  One of my favorites is the 'appmon' module.  It uses Erlang's
+default graphical environment (somewhat unfortunately tk) to dig into the
+state of a running system.
+
+Simply execute this code in the shell:
+
+appmon:start().
+
+It should cause a window to appear.  It may not grab focus, so you might need
+to hunt for it as appropriate for your graphical environment.
+
+The initial view should show a box with the name of the current Erlang node
+with a few children.  Initially, the only one will probably be 'kernel'.
+If you click on that box, it will show you a process map of the kernel
+application.
+
+Note that this application is designed such that parts of it can die or be
+killed, and it can recover.  This is part of what makes Erlang so bulletproof.
+Even the VM itself can be monitored with a "heartbeat" program for this 
+level of reliability.
+
+If you'd like to start some applications, I might suggest 'sasl', the system
+application support library; and 'mnesia', the database.  Interestingly,
+'sasl' provides a whole logging system, and you should probably see some
+interesting messages when you start or manipulate the other applications after
+it's running.
+
+The code to start these applications is:
+
+application:start(sasl).
+application:start(mnesia).
+
+They should appear in the application monitor.  If you want to dig around in
+the graphical utilities unsupervised, you can start the "tool bar".  It is
+exactly what it sounds like.  Simply execute the following:
+
+toolbar:start().
+
+While this covers most of the graphical utilities, there are a few others that
+we will cover later.  When the "event tracer" and "dialyzer" come up, don't be
+surprised that they have interfaces too.
+
+Conclusion
+----------
+
+This concludes the zeroth lesson.  Hopefully you now have an installed Erlang
+installation; cloned the erl-class repository; know how to use or Makefile to
+build code; know how to control the interactive shell; and know just enough
+Erlang to be modicum of trouble.
+
+Next lesson, we'll be tearing into data-types and some code.
