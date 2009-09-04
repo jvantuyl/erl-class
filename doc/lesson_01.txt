@@ -55,7 +55,23 @@ Same here.
 
 4. Lists
 
-TODO
+Lists are, unsurprisingly, lists of values.  They can be nested and contain
+pretty much anything.  Like most functional languages they are constructed
+by adding to the "head" (i.e. the front) of the list, with the rest of the
+list called the tail.  The pipe (|) is used to construct lists this way.
+
+Examples:
+
+* [1, 2, 3]
+* [ Head | Tail ]
+* [a, b, c]
+
+You can also "cheat" and concatenate lists, but be warned that this is fairly
+inefficient.  Example:
+
+* ListA ++ ListB
+
+There is also a "subtraction" (--) operator that removes elements.
 
 5. Strings
 
@@ -79,3 +95,107 @@ TODO
 7. Records
 
 TODO
+
+8. Binaries
+
+TODO
+
+9. Exotic Types
+
+TODO: Refs and PIDs
+
+Preprocessor Magic
+------------------
+
+1. Includes
+
+You can cause one Erlang file to be imported into another using an "include"
+directive.  These included files traditionally are used to serve the same
+function as C's header files.  As such, they typically end in ".hrl".
+
+In addition to the normal "include", there is also "include_lib", which 
+searches the entire code path for an hrl file.
+
+Examples:
+
+* -include("mycode.hrl").
+* -include_lib("qlc.hrl").
+
+2. Parse Transforms
+
+These things can be a little wicked.  They essentially allow you to take the
+parsed version of Erlang source and "transform" it before it's actually turned
+into code.  I'm not probably going to ever cover making one, but it's 
+important to understand when they are in play, as they can bend the rules of
+syntax in unexpected ways.  I won't discuss them in detail now, but you'll
+first see one when we deal with QLC, which is a system that builds queries for
+Erlang's Mnesia database.
+
+3. Macros
+
+These function similarly to the way they do in C.  Unlike C, a macro is 
+invoked when you prepend a defined name with a question mark (?).
+
+Examples:
+
+* -define(MAGIC_NUMBER,42). % defines the magic number
+* is_magic(Num) -> ?MAGIC_NUMBER == Num. % a function that checks for it.
+
+Macros can also be used to define "functions", which expand into more complex
+code.
+
+Examples:
+
+* -define(BYTES_TO_KB(N),N div 1024).
+* KiloBytes = ?BYTES_TO_KB(Bytes), ...
+
+There are some predefined macros that help out generating error messages or
+common code:
+
+* ?MODULE - The name of the current module.
+* ?MODULE_STRING - The name of the current module, as a string.
+* ?FILE - The file name of the current module, as a string.
+* ?LINE - The current line number.
+* ?MACHINE - The interpreter, usually 'BEAM'
+
+In the same vein, there is tokenization / stringification in the style of C.
+For example:
+
+* -define(printme(X),io:format("Called ~s -> ~w~n", [??X, X])).
+
+Invoked as:
+
+* printme(foo:bar(a,b)).
+
+Transforms to:
+
+* io:format("Called ~s -> ~w~n",["foo:bar( a , b )",foo:bar(a,b)]).
+
+Macros can be undefined using -undef().
+
+4. Flow Control
+
+Just like C, there are flow control macros -ifdef., -ifndef. -else., and
+-endif.  I'll leave these to your imagination, as I rarely use them.
+
+Operators
+---------
+
+Note that while most operators are as you'd expect them, there are a few 
+gotchas.  Here are the unusual ones:
+
+* Less Than or Equal To is =< (to avoid looking like an arrow)
+* Bit Shift Left is bsl
+* Bit Shift Right is bsr
+* Bit Not is bnot
+* Bit And is band
+* Bit Or is bor
+* Bit Xor is bxor
+* Remainder is rem
+* Integer Division is div
+
+Also, beware that and/or do not short-circuit.  For short-circuiting versions
+use:
+
+* andalso
+* orelse

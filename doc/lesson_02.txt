@@ -1,0 +1,127 @@
+CLASS NOTES, Lesson 2
+=====================
+
+Execution Model
+---------------
+
+In most languages, you have a "main thread" and then you can spin off other
+threads as you need them.  In most cases, these are "Native Threads--meaning
+that the operating system provides them.  In some cases they are "green 
+threads", meaning that they are emulated in user-space.  Erlang uses a mix of
+these approaches to great effect.
+
+In Erlang, there is one operating system thread thrown off for each processor
+in the machine (at least on modern versions unless you disable SMP).  There
+is also sometimes an I/O thread-pool.  Other than these, there are no more
+threads that the OS sees.
+
+Each of the core threads runs a "scheduler", which will pick up an Erlang
+"process" and execute it for a while.  Since the operating system doesn't have
+to be involved (and since Erlang is optimized to do this fast), scheduling
+processes is very quick.  As long as the operating system doesn't get involved
+with these threads, the system can quickly bounce through processes as 
+needed based on your instructions as to how they should be scheduled.
+
+In cases where the OS does need to be involved (file I/O, networking), a 
+process gets thrown off to one of the Asynchronous I/O threads, which handle
+the I/O in such a way that the schedulers don't get blocked.  In this way,
+you have all of the advantages of OS-level scheduling, with the speed that
+comes from "green threads".
+
+From the Erlang shell, I can spawn a process in less than 1.6 milliseconds.
+As you can see, this makes them very inexpensive for all but the most
+demanding applications.  This is intentional, as they are used extensively
+to hold data and state in Erlang programs.  In fact, I recommend that people
+who are used to classes and instances should mentally map those concepts to
+modules and processes in Erlang.  It's a good fit for making the transition.
+
+Spawning A Process
+------------------
+
+Let's spawn a process that executes a simple function.  Try this in the shell:
+
+* spawn( fun() -> ok end).
+
+You should notice that it returns a process ID (e.g. something like <0.48.0>).
+These identifiers (called PIDs) are the basis for communication in Erlang.
+
+Believe it or not, the shell itself is even a process.  Try:
+
+* self().
+
+This will give you the process of the shell.  Interestingly, this process
+isn't the one that you type into, it's actually a process that executes the
+commands.  If you crash this process it will have a different PID.
+
+For example:
+* self().
+* 1 / 0.
+* self().
+
+The first should return a PID.  The second should have a badarg exception. The
+third should show a different PID.
+
+This is a common theme.  Erlang models everything as PIDs, and quite often 
+allows them to crash.  In Erlang, rather than try to catch every error, we
+try to recover from them.  Being able to recover from any error is much more
+comprehensive than trying to catch all of them.  This is how Erlang has
+developed a reputation as rock-solid.
+
+Sending Messages
+----------------
+
+Each of these processes has a mailbox.  That mailbox can receive messages.
+
+Let's send ourself a message using the bang operator (!), then retrieve it
+using a receive statement.
+
+* self() ! boo.
+* receive X -> X end.
+
+The first sends the message to our mailbox.  The second should return the 
+message, in this case, the atom 'boo'.
+
+Other Process Properties
+------------------------
+
+In addition to the mailbox, processes have a process dictionary, which can be
+changed to hold different values.  It also has process_flags that handle how
+it deals with certain events.  It also has links and monitors, which are how
+you can tie processes together so that they can respond to each other's death.
+
+Finally, processes each even have their own memory.  Unlike most 
+garbage-collected languages, they generally don't share memory at all.  This
+means that one process cleaning up after itself doesn't necessarily impact any
+other processes.
+
+We'll discuss these when the time comes, but for now, let's play a simple game
+with some processes.
+
+The Best of Friends
+-------------------
+
+Back in the day, things weren't as nailed down as they are now.  One more 
+interesting result was an interesting little hack that some Motorola employees
+did to convince the guys at Xerox that they should really fix a certain
+security bug.  This was the story of Robin Hood and Friar Tuck.  You can read
+about it in the Hacker Jargon file, in the Folklore appendix, under "The
+Meaning of Hack".
+
+See here:  http://catb.org/jargon/html/meaning-of-hack.html
+
+If you look at sherwood.erl, it shows simple code for Friar Tuck and Robin
+Hood.
+
+Simply execute this in the shell:
+
+* sherwood:start().
+
+This will start our band of merry men.  Now, if you'd like to kill one, simply
+ask the sheriff to do it for you:
+
+* sherwood:sheriff(robin_hood).
+* sherwood:sheriff(friar_tuck).
+
+Go ahead and try as you might, you can't kill them both so simply.
+
+Enjoy!
